@@ -11,3 +11,6 @@
 
 А тут даже с кодом:
 - https://habr.com/ru/companies/X5Tech/articles/834832/
+
+Векторизация, это:
+https://habr.com/ru/articles/778048/
