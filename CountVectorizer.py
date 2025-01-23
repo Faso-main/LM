@@ -2,7 +2,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
 sents = ['люблю собак',
    'люди нелюди так сказать',
-   'самое высокое здание в мире было спроектировано с моего пениса']
+   'самое высокое здание в мире было спроектировано с моего скипетра']
 
 
 cv = CountVectorizer()
