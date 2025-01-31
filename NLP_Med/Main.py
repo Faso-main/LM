@@ -227,7 +227,7 @@ def main(user_id: str) -> None:
     """
     Основная функция для обработки данных и расчета EDSS.
     """
-    file_path = os.path.join('text', f"{user_id}.txt")
+    file_path = os.path.join('NLP_Med','Anamnes_files', f"{user_id}.txt")
     clinical_text = read_text_file(file_path)
 
     if not clinical_text:
@@ -273,7 +273,7 @@ def main(user_id: str) -> None:
 
     # Оценка текста с использованием BERT
     bert_output = evaluate_model(clinical_text)
-    logging.info(f"BERT эмбеддинг: {bert_output}")
+    #logging.info(f"BERT эмбеддинг: {bert_output}")
 
 if __name__ == "__main__":
     main("551")
