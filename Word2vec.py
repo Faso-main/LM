@@ -22,5 +22,5 @@ print(sents)
 
 custom_model = models.Word2Vec(sents, min_count=1,vector_size=300,workers=4)
 
-vect=custom_model.most_similar('собак')
+#vect=custom_model.most_similar('собак')
 
