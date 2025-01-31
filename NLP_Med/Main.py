@@ -4,6 +4,8 @@ import os
 import torch
 from transformers import BertTokenizer, BertModel
 import logging
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -223,6 +225,33 @@ def evaluate_model(text):
     # Используем усредненный эмбеддинг
     return outputs.last_hidden_state.mean(dim=1)
 
+def visualize_results(scores, edss_score):
+    """
+    Визуализация результатов с использованием seaborn и matplotlib.
+    """
+    # Настройка стиля seaborn
+    sns.set(style="whitegrid")
+
+    # Создание DataFrame для визуализации
+    categories = list(scores.keys())
+    values = list(scores.values())
+
+    # Построение столбчатой диаграммы
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x=categories, y=values, palette="viridis")
+    plt.title("Баллы по категориям EDSS", fontsize=16)
+    plt.xlabel("Категории", fontsize=14)
+    plt.ylabel("Баллы", fontsize=14)
+    plt.xticks(rotation=45, ha='right')
+    plt.ylim(0, 5)  # Ограничение по шкале баллов
+
+    # Добавление итогового EDSS-балла
+    plt.text(0.5, 4.5, f"Итоговый EDSS: {edss_score:.1f}", fontsize=14, color='red')
+
+    # Показать график
+    plt.tight_layout()
+    plt.show()
+
 def main(user_id: str) -> None:
     """
     Основная функция для обработки данных и расчета EDSS.
@@ -270,6 +299,9 @@ def main(user_id: str) -> None:
     # Расчет и вывод EDSS
     edss_score = edss_calculator.calculate_edss()
     logging.info(f'Рассчитанный уровень EDSS: {edss_score:.1f}')
+
+    # Визуализация результатов
+    visualize_results(edss_calculator.scores, edss_score)
 
     # Оценка текста с использованием BERT
     bert_output = evaluate_model(clinical_text)
