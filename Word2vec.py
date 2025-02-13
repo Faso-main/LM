@@ -1,4 +1,5 @@
 from gensim import models
+from pprint import pprint as pp
 
 
 "https://habr.com/ru/articles/801807/"
@@ -12,15 +13,20 @@ Skip-Gram: В этом подходе наоборот, используется
 Для того же примера, модель Skip-Gram будет пытаться предсказать слова "синее", "над", "головой" на основе слова "небо". 
 Skip-Gram медленнее обрабатывает данные, но лучше работает с редкими словами и менее частыми контекстами."""
 
-sents = ['люблю собак',
-   'люди нелюди так сказать',
-   'самое высокое здание в мире было спроектировано с моего скипетра']
+sents = [['люблю', 'собак'],
+         ['люди', 'нелюди', 'так', 'сказать'],
+         ['люди', 'нелюди', 'так', 'сказать'],
+         ['человек', 'радуется', 'такому', 'высказыванию'],
+         ['лучшее', 'массивное', 'потсороение', 'взято'],
+         ['самое', 'высокое', 'здание', 'в', 'мире', 'было', 'спроектировано', 'с', 'моего', 'скипетра']]
 
-
-sents = [sent.split() for sent in sents]
-print(sents)
+#print(sents)
 
 custom_model = models.Word2Vec(sents, min_count=1,vector_size=300,workers=4)
 
-#vect=custom_model.most_similar('собак')
+pp(custom_model.wv.key_to_index)  # Check the learned vocabulary
+
+vect=custom_model.wv.most_similar('собак')
+
+pp(vect)
 
