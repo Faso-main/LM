@@ -7,6 +7,7 @@ import logging
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
 
@@ -230,7 +231,7 @@ def visualize_results(scores, edss_score):
     Визуализация результатов с использованием seaborn и matplotlib.
     """
     # Настройка стиля seaborn
-    sns.set(style="whitegrid")
+    sns.set_theme(style="whitegrid")
 
     # Создание DataFrame для визуализации
     categories = list(scores.keys())
@@ -308,4 +309,4 @@ def main(user_id: str) -> None:
     #logging.info(f"BERT эмбеддинг: {bert_output}")
 
 if __name__ == "__main__":
-    main("551")
+    main("708")
