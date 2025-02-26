@@ -1,1 +1,3 @@
 model.bin
+NLP_Med/Test/Test_V2.py
+bert-medical-classifier/model.safetensors

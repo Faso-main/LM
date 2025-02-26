@@ -9,7 +9,7 @@ from sklearn.metrics import accuracy_score
 MODEL_NAME = 'bert-base-uncased'
 BATCH_SIZE = 16
 MAX_LEN = 128
-EPOCHS = 3
+EPOCHS = 5
 LEARNING_RATE = 2e-5
 
 # 1. Загрузка и подготовка данных
