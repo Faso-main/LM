@@ -1,3 +1,7 @@
 model.bin
 NLP_Med/Test/Test_V2.py
-bert-medical-classifier/model.safetensors
+NLP_Med/trained/bert-medical-classifier/model.safetensors
+NLP_Med/trained/bert-base-uncased_25ep/model.safetensors
+NLP_Med/trained/distilbert-base-uncased_25ep/model.safetensors
+./model.safetensors
+NLP_Med/trained/roberta-base_25ep/model.safetensors
