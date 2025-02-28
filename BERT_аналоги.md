@@ -1,5 +1,7 @@
 # Аналоги BERT: Сильные и слабые стороны
 
+https://habr.com/ru/articles/680986/
+
 ## 1. RoBERTa (Robustly Optimized BERT Approach)
 - **Сильные стороны:**
   - Улучшенная версия BERT с обучением на большем объеме данных.

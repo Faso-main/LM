@@ -17,3 +17,6 @@ https://habr.com/ru/articles/778048/
 
 Формирования базы знаний:
 https://github.com/hundredblocks/concrete_NLP_tutorial/blob/master/NLP_notebook.ipynb
+
+Аналоги BERT:
+https://habr.com/ru/articles/680986/
