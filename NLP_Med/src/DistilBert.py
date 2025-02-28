@@ -13,8 +13,8 @@ BATCH_SIZE = 8
 MAX_LEN = 128
 EPOCHS = 100     
 LEARNING_RATE = 2e-5
-SAVE_PATH = os.path.join('NLP_Med','trained',f'{MODEL_NAME}_{EPOCHS}ep')
-maked_path = os.path.join('NLP_Med','src','marked.json')
+SAVE_PATH = os.path.join('NLP_Med','trained',f'fake_{MODEL_NAME}_{EPOCHS}ep')
+marked_path = os.path.join('NLP_Med','src','fake_marked.json')
 
 
 # 1. Загрузка и подготовка данных
@@ -163,7 +163,7 @@ class MedicalClassifier:
 # Основной пайплайн
 def main():
     # Загрузка данных
-    (train_texts, val_texts, train_labels, val_labels), id2label = load_data(maked_path)
+    (train_texts, val_texts, train_labels, val_labels), id2label = load_data(marked_path)
     
     # Инициализация модели
     tokenizer = DistilBertTokenizer.from_pretrained(MODEL_NAME)
