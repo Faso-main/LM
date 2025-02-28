@@ -22,7 +22,7 @@ def load_data(file_path):
     
     df = pd.DataFrame(data)
     texts = df['текст'].tolist()
-    labels = df['классификация'].tolist()  # Исправлено название столбца
+    labels = df['классификация'].tolist()  
     
     # Преобразование меток в числовой формат
     unique_labels = sorted(list(set(labels)))
@@ -38,16 +38,16 @@ def load_data(file_path):
 
 # 2. Создание Dataset
 class MedicalDataset(Dataset):
-    def __init__(self, texts, labels, tokenizer, max_len):  # Исправлен синтаксис
+    def __init__(self, texts, labels, tokenizer, max_len):  
         self.texts = texts
         self.labels = labels
         self.tokenizer = tokenizer
         self.max_len = max_len
     
-    def __len__(self):  # Исправлен синтаксис
+    def __len__(self):  
         return len(self.texts)
     
-    def __getitem__(self, idx):  # Исправлен синтаксис
+    def __getitem__(self, idx):  
         text = str(self.texts[idx])
         label = self.labels[idx]
         
@@ -117,9 +117,9 @@ def eval_model(model, dataloader, device, id2label):
     print(classification_report(
         true_labels, 
         predictions, 
-        target_names=list(id2label.values()),  # Убедитесь, что количество названий классов соответствует числу классов
+        target_names=list(id2label.values()),  # количество названий дложно совпадать с числом классов
         zero_division=0,
-        labels=list(range(len(id2label)))  # Укажите параметры labels для явного соответствия
+        labels=list(range(len(id2label)))  
     ))
 
     return accuracy_score(true_labels, predictions)
@@ -205,7 +205,7 @@ def main():
     
     print("\nTraining completed!")
 
-if __name__ == '__main__':  # Исправлен синтаксис
+if __name__ == '__main__':  
     main()
 
 # Пример использования после обучения:

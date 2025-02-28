@@ -5,3 +5,4 @@ NLP_Med/trained/bert-base-uncased_25ep/model.safetensors
 NLP_Med/trained/distilbert-base-uncased_25ep/model.safetensors
 ./model.safetensors
 NLP_Med/trained/roberta-base_25ep/model.safetensors
+NLP_Med/trained/distilbert-base-uncased_100ep/model.safetensors

@@ -22,7 +22,7 @@ def load_data(file_path):
     
     df = pd.DataFrame(data)
     texts = df['текст'].tolist()
-    labels = df['классификация'].tolist()  # Исправлено название столбца
+    labels = df['классификация'].tolist()  
     
     # Преобразование меток в числовой формат
     unique_labels = sorted(list(set(labels)))

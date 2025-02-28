@@ -11,9 +11,11 @@ from tqdm import tqdm
 MODEL_NAME = 'distilbert-base-uncased'
 BATCH_SIZE = 8  
 MAX_LEN = 128
-EPOCHS = 5     
+EPOCHS = 100     
 LEARNING_RATE = 2e-5
 SAVE_PATH = os.path.join('NLP_Med','trained',f'{MODEL_NAME}_{EPOCHS}ep')
+maked_path = os.path.join('NLP_Med','src','marked.json')
+
 
 # 1. Загрузка и подготовка данных
 def load_data(file_path):
@@ -22,7 +24,7 @@ def load_data(file_path):
     
     df = pd.DataFrame(data)
     texts = df['текст'].tolist()
-    labels = df['классификация'].tolist()  # Исправлено название столбца
+    labels = df['классификация'].tolist()  
     
     # Преобразование меток в числовой формат
     unique_labels = sorted(list(set(labels)))
@@ -161,8 +163,7 @@ class MedicalClassifier:
 # Основной пайплайн
 def main():
     # Загрузка данных
-    file_path = os.path.join('NLP_Med','src','marked.json')
-    (train_texts, val_texts, train_labels, val_labels), id2label = load_data(file_path)
+    (train_texts, val_texts, train_labels, val_labels), id2label = load_data(maked_path)
     
     # Инициализация модели
     tokenizer = DistilBertTokenizer.from_pretrained(MODEL_NAME)
@@ -210,5 +211,5 @@ if __name__ == '__main__':
 
 # Пример использования после обучения:
 # classifier = MedicalClassifier(SAVE_PATH, 'label2id.json')
-# result = classifier.predict("Пациент жалуется на нарушение зрения")
+# result = classifier.predict('Пациент жалуется на нарушение зрения')
 # print(result)
