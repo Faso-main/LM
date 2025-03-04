@@ -1,0 +1,12 @@
+sentencepiece
+pandas
+torch
+json
+numpy
+transformers
+sklearn
+tqdm
+spacy
+wget
+gensim
+langchain

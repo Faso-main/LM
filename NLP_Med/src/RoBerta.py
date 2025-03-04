@@ -11,9 +11,12 @@ from tqdm import tqdm
 MODEL_NAME = 'roberta-base'
 BATCH_SIZE = 8  
 MAX_LEN = 128
-EPOCHS = 5     
+EPOCHS = 100  
 LEARNING_RATE = 2e-5
-SAVE_PATH = os.path.join('NLP_Med','trained',f'{MODEL_NAME}_{EPOCHS}ep')
+
+SAVE_PATH = os.path.join('NLP_Med', 'trained', f'fake_{MODEL_NAME}_{EPOCHS}ep')
+MARKED_PATH = os.path.join('NLP_Med', 'src', 'fake_marked.json')
+LABLE_PATH= os.path.join('NLP_Med', 'src', 'label2id.json')
 
 # 1. Загрузка и подготовка данных
 def load_data(file_path):
@@ -31,7 +34,7 @@ def load_data(file_path):
     labels = [label2id[label] for label in labels]
     
     # Сохранение меток
-    with open('label2id.json', 'w') as f:
+    with open(LABLE_PATH, 'w') as f:
         json.dump(label2id, f)
     
     return train_test_split(texts, labels, test_size=0.2, random_state=42), id2label
@@ -161,8 +164,7 @@ class MedicalClassifier:
 # Основной пайплайн
 def main():
     # Загрузка данных
-    file_path = os.path.join('NLP_Med','src','marked.json')
-    (train_texts, val_texts, train_labels, val_labels), id2label = load_data(file_path)
+    (train_texts, val_texts, train_labels, val_labels), id2label = load_data(MARKED_PATH)
     
     # Инициализация модели
     tokenizer = RobertaTokenizer.from_pretrained(MODEL_NAME)
