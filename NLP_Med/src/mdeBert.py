@@ -6,7 +6,7 @@ from transformers import DebertaV2Tokenizer, DebertaV2ForSequenceClassification,
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
 from tqdm import tqdm
-import matplotlib.pyplot as plt  # Импортируем библиотеку для построения графиков
+import matplotlib.pyplot as plt  
 
 # Конфигурация
 MODEL_NAME = 'microsoft/mdeberta-v3-base'  # Используем mdeberta

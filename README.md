@@ -20,3 +20,6 @@ https://github.com/hundredblocks/concrete_NLP_tutorial/blob/master/NLP_notebook.
 
 Аналоги BERT:
 https://habr.com/ru/articles/680986/
+
+Конкретно по BERT и MLM:
+https://towardsdatascience.com/how-to-use-bert-from-the-hugging-face-transformer-library-d373a22b0209/
