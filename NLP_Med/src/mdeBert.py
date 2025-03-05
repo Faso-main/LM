@@ -6,12 +6,13 @@ from transformers import DebertaV2Tokenizer, DebertaV2ForSequenceClassification,
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
 from tqdm import tqdm
+import matplotlib.pyplot as plt  # Импортируем библиотеку для построения графиков
 
 # Конфигурация
 MODEL_NAME = 'microsoft/mdeberta-v3-base'  # Используем mdeberta
 BATCH_SIZE = 8  
 MAX_LEN = 128
-EPOCHS = 100     
+EPOCHS = 50     
 LEARNING_RATE = 2e-5
 
 SAVE_PATH = os.path.join('NLP_Med', 'trained', f'fake_{MODEL_NAME}_{EPOCHS}ep')
@@ -189,12 +190,18 @@ def main():
     optimizer = AdamW(model.parameters(), lr=LEARNING_RATE, correct_bias=False)
     scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, total_iters=EPOCHS)
     
+    # Список для хранения точности на валидации
+    val_accuracies = []
+    
     # Цикл обучения
     best_acc = 0
     for epoch in range(EPOCHS):
         print(f'\nEpoch {epoch + 1}/{EPOCHS}')
         train_loss = train_epoch(model, train_loader, optimizer, device, scheduler)
         val_acc = eval_model(model, val_loader, device, id2label)
+        
+        # Сохранение точности валидации
+        val_accuracies.append(val_acc)
         
         # Сохранение лучшей модели
         if val_acc > best_acc:
@@ -206,6 +213,16 @@ def main():
         print(f'Train Loss: {train_loss:.4f} | Val Accuracy: {val_acc:.4f}')
     
     print("\nTraining completed!")
+    
+    # Построение графика точности валидации
+    plt.figure(figsize=(10, 6))
+    plt.plot(range(1, EPOCHS + 1), val_accuracies, marker='o', linestyle='-', color='b')
+    plt.title('Validation Accuracy over Epochs')
+    plt.xlabel('Epoch')
+    plt.ylabel('Validation Accuracy')
+    plt.grid(True)
+    plt.xticks(range(1, EPOCHS + 1))
+    plt.show()
 
 if __name__ == '__main__':
     main()

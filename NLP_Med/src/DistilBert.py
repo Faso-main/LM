@@ -18,7 +18,6 @@ SAVE_PATH = os.path.join('NLP_Med', 'trained', f'fake_{MODEL_NAME}_{EPOCHS}ep')
 MARKED_PATH = os.path.join('NLP_Med', 'src', 'fake_marked.json')
 LABLE_PATH= os.path.join('NLP_Med', 'src', 'label2id.json')
 
-
 # 1. Загрузка и подготовка данных
 def load_data(file_path):
     with open(file_path, 'r', encoding='utf-8') as f:
