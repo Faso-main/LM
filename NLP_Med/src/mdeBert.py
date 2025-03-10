@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 MODEL_NAME = 'microsoft/mdeberta-v3-base'  # Используем mdeberta
 BATCH_SIZE = 8  
 MAX_LEN = 128
-EPOCHS = 50     
+EPOCHS = 150     
 LEARNING_RATE = 2e-5
 
 SAVE_PATH = os.path.join('NLP_Med', 'trained', f'fake_{MODEL_NAME}_{EPOCHS}ep')
