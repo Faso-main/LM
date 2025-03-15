@@ -26,3 +26,6 @@ https://towardsdatascience.com/how-to-use-bert-from-the-hugging-face-transformer
 
 Дополнительно вариации моделей:
 https://habr.com/ru/companies/just_ai/articles/733110/
+
+Полное собрание LLM на гите:
+https://github.com/Hannibal046/Awesome-LLM?tab=readme-ov-file
