@@ -17,3 +17,5 @@ NLP_Med/trained/fake_microsoft/mdeberta-v3-base_150ep/model.safetensors
 NLP_Med/trained/fake_microsoft/mdeberta-v3-base_150ep/spm.model
 NLP_Med/trained/fake_microsoft/mdeberta-v3-base_5ep/model.safetensors
 NLP_Med/trained/fake_microsoft/mdeberta-v3-base_5ep/spm.model
+NLP_Med/trained/fake_t5-small_5ep/spiece.model
+NLP_Med/trained/fake_t5-small_5ep/model.safetensors

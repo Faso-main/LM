@@ -2,7 +2,7 @@ import pandas as pd
 import torch, json, os
 import numpy as np
 from torch.utils.data import Dataset, DataLoader
-from transformers import DebertaV2Tokenizer, DebertaV2ForSequenceClassification, AdamW
+from transformers import T5Tokenizer, T5ForConditionalGeneration, AdamW
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report, f1_score, recall_score
 from tqdm import tqdm
@@ -11,7 +11,7 @@ import time
 import psutil
 
 # Конфигурация
-MODEL_NAME = 'microsoft/mdeberta-v3-base'  # Используем mdeberta
+MODEL_NAME = 't5-small'  # Используем T5-small
 BATCH_SIZE = 8  
 MAX_LEN = 128
 EPOCHS = 5     
@@ -31,7 +31,7 @@ def load_data(file_path):
     texts = df['текст'].tolist()
     labels = df['классификация'].tolist()  
     
-    # Преобразование меток в числовой формат
+    # Преобразование меток в текстовый формат (T5 работает с текстом)
     unique_labels = sorted(list(set(labels)))
     label2id = {label: idx for idx, label in enumerate(unique_labels)}
     id2label = {idx: label for label, idx in label2id.items()}
@@ -56,22 +56,29 @@ class MedicalDataset(Dataset):
     
     def __getitem__(self, idx):
         text = str(self.texts[idx])
-        label = self.labels[idx]
+        label = str(self.labels[idx])  # Преобразуем метку в строку
         
-        encoding = self.tokenizer.encode_plus(
+        # Кодируем текст и метку
+        encoding = self.tokenizer(
             text,
-            add_special_tokens=True,
             max_length=self.max_len,
             padding='max_length',
             truncation=True,
-            return_attention_mask=True,
+            return_tensors='pt'
+        )
+        
+        target_encoding = self.tokenizer(
+            label,
+            max_length=10,  # Максимальная длина метки
+            padding='max_length',
+            truncation=True,
             return_tensors='pt'
         )
         
         return {
             'input_ids': encoding['input_ids'].flatten(),
             'attention_mask': encoding['attention_mask'].flatten(),
-            'labels': torch.tensor(label, dtype=torch.long)
+            'labels': target_encoding['input_ids'].flatten()  # Используем input_ids для меток
         }
 
 # 3. Обучение модели
@@ -87,7 +94,7 @@ def train_epoch(model, dataloader, optimizer, device, scheduler=None):
         attention_mask = batch['attention_mask'].to(device)
         labels = batch['labels'].to(device)
         
-        outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+        outputs = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
         loss = outputs.loss
         total_loss += loss.item()
         
@@ -102,7 +109,7 @@ def train_epoch(model, dataloader, optimizer, device, scheduler=None):
     return total_loss / len(dataloader)
 
 # 4. Валидация
-def eval_model(model, dataloader, device, id2label):
+def eval_model(model, dataloader, device, id2label, tokenizer):
     model.eval()
     predictions = []
     true_labels = []
@@ -113,11 +120,18 @@ def eval_model(model, dataloader, device, id2label):
             attention_mask = batch['attention_mask'].to(device)
             labels = batch['labels'].to(device)
             
-            outputs = model(input_ids, attention_mask=attention_mask)
-            _, preds = torch.max(outputs.logits, dim=1)
+            # Генерация предсказаний
+            generated_ids = model.generate(input_ids=input_ids, attention_mask=attention_mask, max_length=10)
+            preds = [tokenizer.decode(g_id, skip_special_tokens=True) for g_id in generated_ids]
+            true = [tokenizer.decode(t_id, skip_special_tokens=True) for t_id in labels]
             
-            predictions.extend(preds.cpu().numpy())
-            true_labels.extend(labels.cpu().numpy())
+            predictions.extend(preds)
+            true_labels.extend(true)
+    
+    # Преобразование текстовых меток в числовые
+    # Заменяем пустые строки на значение по умолчанию (например, 0)
+    predictions = [int(label) if label.strip() != '' else 0 for label in predictions]
+    true_labels = [int(label) for label in true_labels]
     
     # Генерация отчета
     print("\nClassification Report:")
@@ -150,8 +164,8 @@ def eval_model(model, dataloader, device, id2label):
 class MedicalClassifier:
     def __init__(self, model_path, label2id_path):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.model = DebertaV2ForSequenceClassification.from_pretrained(model_path).to(self.device)
-        self.tokenizer = DebertaV2Tokenizer.from_pretrained(model_path)
+        self.model = T5ForConditionalGeneration.from_pretrained(model_path).to(self.device)
+        self.tokenizer = T5Tokenizer.from_pretrained(model_path)
         
         with open(label2id_path) as f:
             self.label2id = json.load(f)
@@ -159,9 +173,8 @@ class MedicalClassifier:
     
     def predict(self, text):
         self.model.eval()
-        encoding = self.tokenizer.encode_plus(
+        encoding = self.tokenizer(
             text,
-            add_special_tokens=True,
             max_length=MAX_LEN,
             padding='max_length',
             truncation=True,
@@ -169,15 +182,12 @@ class MedicalClassifier:
         ).to(self.device)
         
         with torch.no_grad():
-            outputs = self.model(**encoding)
+            generated_ids = self.model.generate(**encoding, max_length=10)
         
-        probs = torch.nn.functional.softmax(outputs.logits, dim=1)
-        pred_idx = torch.argmax(probs).item()
-        
+        pred_label = self.tokenizer.decode(generated_ids[0], skip_special_tokens=True)
         return {
-            'class': self.id2label[pred_idx],
-            'confidence': probs[0][pred_idx].item(),
-            'probabilities': {self.id2label[i]: p.item() for i, p in enumerate(probs[0])}
+            'class': self.id2label[int(pred_label)],
+            'confidence': 1.0  # T5 не возвращает вероятности, поэтому используем 1.0
         }
 
 # Основной пайплайн
@@ -186,13 +196,8 @@ def main():
     (train_texts, val_texts, train_labels, val_labels), id2label = load_data(MARKED_PATH)
     
     # Инициализация модели
-    tokenizer = DebertaV2Tokenizer.from_pretrained(MODEL_NAME)
-    model = DebertaV2ForSequenceClassification.from_pretrained(
-        MODEL_NAME,
-        num_labels=len(id2label),
-        id2label=id2label,
-        label2id={v: k for k, v in id2label.items()}
-    )
+    tokenizer = T5Tokenizer.from_pretrained(MODEL_NAME)
+    model = T5ForConditionalGeneration.from_pretrained(MODEL_NAME)
     
     # Создание DataLoader
     train_dataset = MedicalDataset(train_texts, train_labels, tokenizer, MAX_LEN)
@@ -217,7 +222,7 @@ def main():
         print(f'\nEpoch {epoch + 1}/{EPOCHS}')
         start_time = time.time()
         train_loss = train_epoch(model, train_loader, optimizer, device, scheduler)
-        val_acc, f1, recall, memory_usage = eval_model(model, val_loader, device, id2label)
+        val_acc, f1, recall, memory_usage = eval_model(model, val_loader, device, id2label, tokenizer)
         epoch_time = time.time() - start_time
         
         # Сохранение результатов
