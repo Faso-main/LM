@@ -29,3 +29,6 @@ https://habr.com/ru/companies/just_ai/articles/733110/
 
 Полное собрание LLM на гите:
 https://github.com/Hannibal046/Awesome-LLM?tab=readme-ov-file
+
+Полный научный граф статей по языковым моделям:
+https://www.connectedpapers.com/main/df2b0e26d0599ce3e70df8a9da02e51594e0e992/graph
