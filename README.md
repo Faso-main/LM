@@ -33,5 +33,5 @@ https://github.com/Hannibal046/Awesome-LLM?tab=readme-ov-file
 Полный научный граф статей по языковым моделям:
 https://www.connectedpapers.com/main/df2b0e26d0599ce3e70df8a9da02e51594e0e992/graph
 
-Хорошая визуализауия Worf2Vec:
+Хорошая визуализация Word2Vec:
 https://habr.com/ru/articles/446530/
