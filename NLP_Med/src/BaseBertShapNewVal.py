@@ -2,7 +2,7 @@ import pandas as pd
 import torch, json, os
 import numpy as np
 from torch.utils.data import Dataset, DataLoader
-from transformers import DebertaV2Tokenizer, DebertaV2ForSequenceClassification, AdamW
+from transformers import BertTokenizer, BertForSequenceClassification, AdamW
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report, f1_score, recall_score
 from tqdm import tqdm
@@ -12,7 +12,7 @@ import psutil
 import shap  
 
 # Конфигурация
-MODEL_NAME = 'microsoft/mdeberta-v3-base'  # Используем mdeberta
+MODEL_NAME = 'bert-base-uncased'  # Используем mdeberta
 BATCH_SIZE = 8  
 MAX_LEN = 128
 EPOCHS = 5     
@@ -151,8 +151,8 @@ def eval_model(model, dataloader, device, id2label):
 class MedicalClassifier:
     def __init__(self, model_path, label2id_path):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.model = DebertaV2ForSequenceClassification.from_pretrained(model_path).to(self.device)
-        self.tokenizer = DebertaV2Tokenizer.from_pretrained(model_path)
+        self.model = BertForSequenceClassification.from_pretrained(model_path).to(self.device)
+        self.tokenizer = BertTokenizer.from_pretrained(model_path)
         
         with open(label2id_path) as f:
             self.label2id = json.load(f)
@@ -187,8 +187,8 @@ def main():
     (train_texts, val_texts, train_labels, val_labels), id2label = load_data(MARKED_PATH)
     
     # Инициализация модели
-    tokenizer = DebertaV2Tokenizer.from_pretrained(MODEL_NAME)
-    model = DebertaV2ForSequenceClassification.from_pretrained(
+    tokenizer = BertTokenizer.from_pretrained(MODEL_NAME)
+    model = BertForSequenceClassification.from_pretrained(
         MODEL_NAME,
         num_labels=len(id2label),
         id2label=id2label,
@@ -262,8 +262,8 @@ def main():
     print("\nGenerating SHAP explanations...")
     
     # Загрузка лучшей модели
-    model = DebertaV2ForSequenceClassification.from_pretrained(SAVE_PATH).to(device)
-    tokenizer = DebertaV2Tokenizer.from_pretrained(SAVE_PATH)
+    model = BertForSequenceClassification.from_pretrained(SAVE_PATH).to(device)
+    tokenizer = BertTokenizer.from_pretrained(SAVE_PATH)
     
     # Выбор примеров для визуализации
     sample_texts = val_texts[:3]  # Первые 3 примера из валидации
