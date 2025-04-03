@@ -25,6 +25,7 @@ SAVE_PATH = os.path.join('NLP_Med', 'trained', f'fake_{MODEL_NAME}_{EPOCHS}ep')
 MARKED_PATH = os.path.join('NLP_Med', 'src', 'fake_marked.json')
 LABLE_PATH = os.path.join('NLP_Med', 'src', 'label2id.json')
 RESULTS_PATH = os.path.join('NLP_Med', 'src', 'results', f'fake_{MODEL_NAME}_{EPOCHS}ep.csv')
+RESULTS_DIR_PATH=os.path.join('NLP_Med', 'src', 'results')
 IMG_PATH= os.path.join('NLP_Med', 'src', 'results', f'fake_plot_{MODEL_NAME}_{EPOCHS}ep.png')
 
 # 1. Улучшенная загрузка данных с обработкой редких классов
@@ -307,7 +308,7 @@ def main():
     plt.legend()
     
     plt.tight_layout()
-    os.makedirs(os.path.join('NLP_Med', 'src', 'results'), exist_ok=True)
+    os.makedirs(RESULTS_DIR_PATH, exist_ok=True)
     plt.savefig(IMG_PATH)
     plt.show()
     
