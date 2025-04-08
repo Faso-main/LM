@@ -36,5 +36,5 @@ https://www.connectedpapers.com/main/df2b0e26d0599ce3e70df8a9da02e51594e0e992/gr
 Хорошая визуализация Word2Vec:
 https://habr.com/ru/articles/446530/
 
-MLP и KAN:
+MLP и KAN habr:
 https://habr.com/ru/news/811619/
