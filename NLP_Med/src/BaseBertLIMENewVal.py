@@ -252,12 +252,13 @@ def main():
     train_dataset = MedicalDataset(train_texts, train_labels, tokenizer, MAX_LEN)
     val_dataset = MedicalDataset(val_texts, val_labels, tokenizer, MAX_LEN)
     
-    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
-    val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=4)
+    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=0)
+    val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=0)
     
     # Устройство и оптимизатор
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = model.to(device)
+    model.gradient_checkpointing_enable()
     
     optimizer = AdamW(model.parameters(), lr=LEARNING_RATE, correct_bias=False)
     total_steps = len(train_loader) * EPOCHS
@@ -359,15 +360,19 @@ def main():
                 # Генерация объяснения
                 explanation = explain_with_lime(
                     model, tokenizer, device, id2label, text,
-                    num_features=10, num_samples=5000
+                    num_features=10, num_samples=1000
                 )
                 
                 # Визуализация объяснения
+                """
+                Выдаёт ошибку Ipyhon. Не смог исправить
                 print("\nОбъяснение (важные слова для предсказания):")
                 explanation.show_in_notebook(text=True)
+                """
+
                 
-                # Сохранение объяснения в HTML
-                html_path = os.path.join(RESULTS_DIR_PATH, f'lime_explanation_{i+1}.html')
+                # Сохранение объяснения в HTML                                                          
+                html_path = os.path.join('NLP_Med', 'src', 'results', 'graph_visualization', f'lime_explanation_{i+1}.html')
                 explanation.save_to_file(html_path)
                 print(f"Объяснение сохранено в {html_path}")
                 
