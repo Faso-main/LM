@@ -129,3 +129,4 @@ NLP_Med/trained/fake_bert-base-uncased_10ep/model.safetensors
 NLP_Med/trained/fake_bert-base-uncased_5ep/model.safetensors
 NLP_Med/trained/fake_bert-base-uncased_15ep/model.safetensors
 NLP_Med/trained/fake_bert-base-uncased_20ep/model.safetensors
+NLP_Med/trained/fake_google/electra-base-discriminator_20ep/model.safetensors
