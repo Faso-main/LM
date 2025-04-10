@@ -2,7 +2,7 @@ import pandas as pd
 import torch, json, os
 import numpy as np
 from torch.utils.data import Dataset, DataLoader
-from transformers import ElectraTokenizer, ElectraForSequenceClassification, AdamW, get_linear_schedule_with_warmup
+from transformers import T5Tokenizer, T5ForConditionalGeneration, AdamW, get_linear_schedule_with_warmup
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report, f1_score, recall_score
 from tqdm import tqdm
@@ -11,23 +11,22 @@ import time
 import psutil
 from sklearn.utils.class_weight import compute_class_weight
 
-# Конфигурация (изменено на ELECTRA)
-MODEL_NAME = 'google/electra-base-discriminator'  # Или 'google/electra-small-discriminator' для меньшей модели
-BATCH_SIZE = 16
+# Конфигурация для ruT5-large
+MODEL_NAME = 'ai-forever/ruT5-large'
+BATCH_SIZE = 8  
 MAX_LEN = 256
 EPOCHS = 20
-LEARNING_RATE = 3e-5
+LEARNING_RATE = 2e-5
 WARMUP_STEPS = 100
 
-
-SAVE_PATH = os.path.join('NLP_Med', 'trained', f'fake_electra_{EPOCHS}ep')
+# Пути
+SAVE_PATH = os.path.join('NLP_Med', 'trained', f'fake_ruT5-large_{EPOCHS}ep')
 MARKED_PATH = os.path.join('NLP_Med', 'src', 'fake_marked.json')
 LABLE_PATH = os.path.join('NLP_Med', 'src', 'label2id.json')
-RESULTS_PATH = os.path.join('NLP_Med', 'src', 'results', f'fake_electra_{EPOCHS}ep.csv')
+RESULTS_PATH = os.path.join('NLP_Med', 'src', 'results', f'fake_ruT5-large_{EPOCHS}ep.csv')
 RESULTS_DIR_PATH = os.path.join('NLP_Med', 'src', 'results')
-IMG_PATH = os.path.join('NLP_Med', 'src', 'results', f'fake_plot_electra_{EPOCHS}ep.png')
+IMG_PATH = os.path.join('NLP_Med', 'src', 'results', f'fake_plot_ruT5-large_{EPOCHS}ep.png')
 
-# 1. Улучшенная загрузка данных с обработкой редких классов
 def load_data(file_path):
     with open(file_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
@@ -78,49 +77,48 @@ def load_data(file_path):
     
     return (train_texts, val_texts, train_labels, val_labels), id2label, label2id
 
-# 2. Датасет
 class MedicalDataset(Dataset):
     def __init__(self, texts, labels, tokenizer, max_len):
         self.texts = texts
         self.labels = labels
         self.tokenizer = tokenizer
         self.max_len = max_len
+        self.label_texts = [str(label) for label in labels]  
     
     def __len__(self):
         return len(self.texts)
     
     def __getitem__(self, idx):
         text = str(self.texts[idx])
-        label = self.labels[idx]
+        label_text = self.label_texts[idx]
         
-        encoding = self.tokenizer.encode_plus(
+        # Кодируем текст и метку
+        text_encoding = self.tokenizer(
             text,
-            add_special_tokens=True,
             max_length=self.max_len,
             padding='max_length',
             truncation=True,
-            return_attention_mask=True,
-            return_tensors='pt',
-            truncation_strategy='longest_first'
+            return_tensors='pt'
+        )
+        
+        label_encoding = self.tokenizer(
+            label_text,
+            max_length=10, 
+            padding='max_length',
+            truncation=True,
+            return_tensors='pt'
         )
         
         return {
-            'input_ids': encoding['input_ids'].flatten(),
-            'attention_mask': encoding['attention_mask'].flatten(),
-            'labels': torch.tensor(label, dtype=torch.long)
+            'input_ids': text_encoding['input_ids'].flatten(),
+            'attention_mask': text_encoding['attention_mask'].flatten(),
+            'labels': label_encoding['input_ids'].flatten()
         }
 
-# 3. Обучение с учетом весов классов
 def train_epoch(model, dataloader, optimizer, device, scheduler, class_weights=None):
     model.train()
     total_loss = 0
     progress_bar = tqdm(dataloader, desc='Training', leave=False)
-    
-    if class_weights is not None:
-        class_weights = class_weights.to(device)
-        loss_fct = torch.nn.CrossEntropyLoss(weight=class_weights)
-    else:
-        loss_fct = torch.nn.CrossEntropyLoss()
     
     for batch in progress_bar:
         optimizer.zero_grad()
@@ -129,8 +127,13 @@ def train_epoch(model, dataloader, optimizer, device, scheduler, class_weights=N
         attention_mask = batch['attention_mask'].to(device)
         labels = batch['labels'].to(device)
         
-        outputs = model(input_ids, attention_mask=attention_mask)
-        loss = loss_fct(outputs.logits.view(-1, model.config.num_labels), labels.view(-1))
+        outputs = model(
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+            labels=labels
+        )
+        
+        loss = outputs.loss
         
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
@@ -142,8 +145,7 @@ def train_epoch(model, dataloader, optimizer, device, scheduler, class_weights=N
     
     return total_loss / len(dataloader)
 
-# 4. Валидация
-def eval_model(model, dataloader, device, id2label):
+def eval_model(model, dataloader, device, id2label, tokenizer):
     model.eval()
     predictions = []
     true_labels = []
@@ -154,37 +156,50 @@ def eval_model(model, dataloader, device, id2label):
             attention_mask = batch['attention_mask'].to(device)
             labels = batch['labels'].to(device)
             
-            outputs = model(input_ids, attention_mask=attention_mask)
-            _, preds = torch.max(outputs.logits, dim=1)
+            # Генерация предсказаний
+            generated_ids = model.generate(
+                input_ids=input_ids,
+                attention_mask=attention_mask,
+                max_length=10  # Такая же длина как у меток
+            )
             
-            predictions.extend(preds.cpu().numpy())
-            true_labels.extend(labels.cpu().numpy())
+            # Декодируем предсказания и истинные метки
+            preds = [tokenizer.decode(ids, skip_special_tokens=True) for ids in generated_ids]
+            truths = [tokenizer.decode(ids, skip_special_tokens=True) for ids in labels]
+            
+            # Конвертируем текстовые метки обратно в числовые
+            preds_num = [int(p) if p.isdigit() else -1 for p in preds]
+            truths_num = [int(t) if t.isdigit() else -1 for t in truths]
+            
+            predictions.extend(preds_num)
+            true_labels.extend(truths_num)
+    
+    # Фильтруем невалидные предсказания
+    valid_indices = [i for i, pred in enumerate(predictions) if pred != -1]
+    filtered_predictions = [predictions[i] for i in valid_indices]
+    filtered_true_labels = [true_labels[i] for i in valid_indices]
+    
+    if not filtered_predictions:
+        print("Нет валидных предсказаний для оценки!")
+        return 0, 0, 0, 0
     
     # Подробный отчет
     print("\nDetailed Classification Report:")
-    report = classification_report(
-        true_labels, 
-        predictions, 
-        target_names=list(id2label.values()),
-        zero_division=0,
-        output_dict=True
-    )
     print(classification_report(
-        true_labels, 
-        predictions, 
+        filtered_true_labels, 
+        filtered_predictions, 
         target_names=list(id2label.values()),
         zero_division=0
     ))
     
     # Метрики
-    accuracy = accuracy_score(true_labels, predictions)
-    f1 = f1_score(true_labels, predictions, average='weighted')
-    recall = recall_score(true_labels, predictions, average='weighted')
+    accuracy = accuracy_score(filtered_true_labels, filtered_predictions)
+    f1 = f1_score(filtered_true_labels, filtered_predictions, average='weighted')
+    recall = recall_score(filtered_true_labels, filtered_predictions, average='weighted')
     memory_usage = psutil.Process().memory_info().rss / 1024 ** 2
     
     return accuracy, f1, recall, memory_usage
 
-# Основной пайплайн
 def main():
     # Загрузка данных
     try:
@@ -193,22 +208,13 @@ def main():
         print(f"Ошибка загрузки данных: {e}")
         return
     
-    # Вычисление весов классов
-    class_weights = compute_class_weight(
-        'balanced',
-        classes=np.unique(train_labels),
-        y=train_labels
-    )
-    class_weights = torch.tensor(class_weights, dtype=torch.float)
+    # Инициализация модели 
+    tokenizer = T5Tokenizer.from_pretrained(MODEL_NAME)
+    model = T5ForConditionalGeneration.from_pretrained(MODEL_NAME)
     
-    # Инициализация модели ELECTRA
-    tokenizer = ElectraTokenizer.from_pretrained(MODEL_NAME)
-    model = ElectraForSequenceClassification.from_pretrained(
-        MODEL_NAME,
-        num_labels=len(id2label),
-        id2label=id2label,
-        label2id=label2id
-    )
+    # Добавляем специальные токены для классификации
+    tokenizer.add_tokens([str(label) for label in label2id.values()])
+    model.resize_token_embeddings(len(tokenizer))
     
     # Даталоадеры
     train_dataset = MedicalDataset(train_texts, train_labels, tokenizer, MAX_LEN)
@@ -221,7 +227,7 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = model.to(device)
     
-    optimizer = AdamW(model.parameters(), lr=LEARNING_RATE, correct_bias=False)
+    optimizer = AdamW(model.parameters(), lr=LEARNING_RATE)
     total_steps = len(train_loader) * EPOCHS
     scheduler = get_linear_schedule_with_warmup(
         optimizer,
@@ -238,12 +244,11 @@ def main():
         start_time = time.time()
         
         train_loss = train_epoch(
-            model, train_loader, optimizer, device, 
-            scheduler, class_weights
+            model, train_loader, optimizer, device, scheduler
         )
         
         val_acc, f1, recall, memory_usage = eval_model(
-            model, val_loader, device, id2label
+            model, val_loader, device, id2label, tokenizer
         )
         
         epoch_time = time.time() - start_time
