@@ -1,40 +1,35 @@
-## LLM example and test field
+## Официальные репозитории и ключевые ресурсы по LLM (Фразы на русском языке)
 
-- https://habr.com/ru/companies/raft/articles/791034/
+Вот некоторые официальные репозитории и важные ресурсы, связанные с большими языковыми моделями (LLM):
 
-Вот примеры кода:
-- https://github.com/SweetB0nes/RAG_GigaChat/tree/main
-- https://github.com/Syrenny/DeepHack.Agents_2024/tree/main
+**Примеры кодовых репозиториев:**
 
-Вот тут хороший вариант:
-- https://habr.com/ru/articles/823568/
+* **Пример реализации RAG с GigaChat:** [https://github.com/SweetB0nes/RAG_GigaChat/tree/main](https://github.com/SweetB0nes/RAG_GigaChat/tree/main)
+* **Проект DeepHack.Agents (потенциально связанный с LLM):** [https://github.com/Syrenny/DeepHack.Agents_2024/tree/main](https://github.com/Syrenny/DeepHack.Agents_2024/tree/main)
 
-А тут даже с кодом:
-- https://habr.com/ru/companies/X5Tech/articles/834832/
+**Ключевые статьи и объяснения:**
 
-Векторизация, это:
-https://habr.com/ru/articles/778048/
+* **Обзор концепций LLM:** [https://habr.com/ru/articles/791034/](https://habr.com/ru/articles/791034/)
+* **Практические применения и идеи:** [https://habr.com/ru/articles/823568/](https://habr.com/ru/articles/823568/)
+* **Пример реализации с кодом:** [https://habr.com/ru/companies/X5Tech/articles/834832/](https://habr.com/ru/companies/X5Tech/articles/834832/)
 
-Формирования базы знаний:
-https://github.com/hundredblocks/concrete_NLP_tutorial/blob/master/NLP_notebook.ipynb
+**Основные концепции:**
 
-Аналоги BERT:
-https://habr.com/ru/articles/680986/
+* **Понимание векторизации:** [https://habr.com/ru/articles/778048/](https://habr.com/ru/articles/778048/)
+* **Формирование баз знаний для LLM:** [https://github.com/hundredblocks/concrete_NLP_tutorial/blob/master/NLP_notebook.ipynb](https://github.com/hundredblocks/concrete_NLP_tutorial/blob/master/NLP_notebook.ipynb)
 
-Конкретно по BERT и MLM:
-https://towardsdatascience.com/how-to-use-bert-from-the-hugging-face-transformer-library-d373a22b0209/
+**Архитектуры моделей и вариации:**
 
-Дополнительно вариации моделей:
-https://habr.com/ru/companies/just_ai/articles/733110/
+* **Аналоги BERT:** [https://habr.com/ru/articles/680986/](https://habr.com/ru/articles/680986/)
+* **BERT и маскированное языковое моделирование (MLM):** [https://towardsdatascience.com/how-to-use-bert-from-the-hugging-face-transformer-library-d373a22b0209/](https://towardsdatascience.com/how-to-use-bert-from-the-hugging-face-transformer-library-d373a22b0209/)
+* **Изучение различных архитектур LLM:** [https://habr.com/ru/companies/just_ai/articles/733110/](https://habr.com/ru/companies/just_ai/articles/733110/)
 
-Полное собрание LLM на гите:
-https://github.com/Hannibal046/Awesome-LLM?tab=readme-ov-file
+**Обширные ресурсы:**
 
-Полный научный граф статей по языковым моделям:
-https://www.connectedpapers.com/main/df2b0e26d0599ce3e70df8a9da02e51594e0e992/graph
+* **Awesome LLM - Курируемый список языковых моделей:** [https://github.com/Hannibal046/Awesome-LLM?tab=readme-ov-file](https://github.com/Hannibal046/Awesome-LLM?tab=readme-ov-file)
+* **Connected Papers - Граф научной литературы по языковым моделям:** [https://www.connectedpapers.com/main/df2b0e26d0599ce3e70df8a9da02e51594e0e992/graph](https://www.connectedpapers.com/main/df2b0e26d0599ce3e70df8a9da02e51594e0e992/graph)
 
-Хорошая визуализация Word2Vec:
-https://habr.com/ru/articles/446530/
+**Визуализации и смежные концепции:**
 
-MLP и KAN habr:
-https://habr.com/ru/news/811619/
+* **Визуализация векторных представлений слов (Word2Vec):** [https://habr.com/ru/articles/446530/](https://habr.com/ru/articles/446530/)
+* **Последние достижения в нейронных сетях (MLP и KAN):** [https://habr.com/ru/news/811619/](https://habr.com/ru/news/811619/)
