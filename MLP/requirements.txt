@@ -1,0 +1,8 @@
+# Основные зависимости
+scikit-learn>=1.0.2
+numpy>=1.21.0
+
+tensorflow>=2.6.0
+torch>=1.9.0
+matplotlib>=3.4.0  
+pandas>=1.3.0      
