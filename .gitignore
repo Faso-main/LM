@@ -131,3 +131,8 @@ NLP_Med/trained/fake_bert-base-uncased_15ep/model.safetensors
 NLP_Med/trained/fake_bert-base-uncased_20ep/model.safetensors
 NLP_Med/trained/fake_google/electra-base-discriminator_20ep/model.safetensors
 MLP/src/mlp_torch.py
+Дерево_данных/README.md
+Дерево_данных/example1/example.json
+Дерево_данных/example1/example.txt
+Дерево_данных/example1/example.xml
+NLP_Med/trained/fake_roberta-base_25ep/model.safetensors
