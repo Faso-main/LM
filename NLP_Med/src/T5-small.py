@@ -14,7 +14,7 @@ import psutil
 MODEL_NAME = 't5-small'  # Используем T5-small
 BATCH_SIZE = 8  
 MAX_LEN = 128
-EPOCHS = 5     
+EPOCHS = 20     
 LEARNING_RATE = 2e-5
 
 SAVE_PATH = os.path.join('NLP_Med', 'trained', f'fake_{MODEL_NAME}_{EPOCHS}ep')
@@ -114,6 +114,10 @@ def eval_model(model, dataloader, device, id2label, tokenizer):
     predictions = []
     true_labels = []
     
+    # Загрузка label2id
+    with open(LABLE_PATH, 'r') as f:
+        label2id = json.load(f)
+    
     with torch.no_grad():
         for batch in tqdm(dataloader, desc='Validation', leave=False):
             input_ids = batch['input_ids'].to(device)
@@ -128,27 +132,48 @@ def eval_model(model, dataloader, device, id2label, tokenizer):
             predictions.extend(preds)
             true_labels.extend(true)
     
-    # Преобразование текстовых меток в числовые
-    # Заменяем пустые строки на значение по умолчанию (например, 0)
-    predictions = [int(label) if label.strip() != '' else 0 for label in predictions]
-    true_labels = [int(label) for label in true_labels]
+    # Преобразование текстовых меток в числовые id
+    processed_preds = []
+    for label in predictions:
+        label = label.strip()
+        # Проверяем, является ли метка исходным названием класса
+        if label in label2id:
+            processed_preds.append(label2id[label])
+        else:
+            # Пытаемся преобразовать в число (id)
+            try:
+                pred_id = int(label)
+                processed_preds.append(pred_id)
+            except ValueError:
+                # Если не удается, используем значение по умолчанию (например, 0)
+                processed_preds.append(0)
+    
+    # Обработка истинных меток (они должны быть id)
+    processed_true = []
+    for label in true_labels:
+        label = label.strip()
+        try:
+            true_id = int(label)
+            processed_true.append(true_id)
+        except ValueError:
+            processed_true.append(0)
     
     # Генерация отчета
     print("\nClassification Report:")
     report = classification_report(
-        true_labels, 
-        predictions, 
+        processed_true, 
+        processed_preds, 
         target_names=list(id2label.values()),
         zero_division=0,
-        labels=list(range(len(id2label))),
+        labels=list(id2label.keys()),
         output_dict=True
     )
     print(classification_report(
-        true_labels, 
-        predictions, 
+        processed_true, 
+        processed_preds, 
         target_names=list(id2label.values()),
         zero_division=0,
-        labels=list(range(len(id2label)))
+        labels=list(id2label.keys())
     ))
     
     # Использование памяти
@@ -158,7 +183,7 @@ def eval_model(model, dataloader, device, id2label, tokenizer):
     f1 = report['weighted avg']['f1-score']
     recall = report['weighted avg']['recall']
     
-    return accuracy_score(true_labels, predictions), f1, recall, memory_usage
+    return accuracy_score(processed_true, processed_preds), f1, recall, memory_usage
 
 # 5. Прогнозирование
 class MedicalClassifier:

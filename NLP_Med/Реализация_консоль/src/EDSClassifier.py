@@ -3,13 +3,13 @@ import torch
 from transformers import RobertaTokenizer, RobertaForSequenceClassification
 
 class EDSClassifier:
-    def __init__(self, model_path, label2id_path):
+    def __init__(self):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model = RobertaForSequenceClassification.from_pretrained(model_path).to(self.device)
-        self.tokenizer = RobertaTokenizer.from_pretrained(model_path)
+        self.model = RobertaForSequenceClassification.from_pretrained(MODEL_PATH).to(self.device)
+        self.tokenizer = RobertaTokenizer.from_pretrained(MODEL_PATH)
         
         # Загрузка меток
-        with open(label2id_path, "r") as f:
+        with open(LABEL2ID_PATH, "r", encoding='utf-8') as f:
             self.label2id = json.load(f)
             self.id2label = {v: k for k, v in self.label2id.items()}
     

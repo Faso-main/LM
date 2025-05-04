@@ -132,3 +132,15 @@ NLP_Med/trained/fake_bert-base-uncased_20ep/model.safetensors
 NLP_Med/trained/fake_google/electra-base-discriminator_20ep/model.safetensors
 MLP/src/mlp_torch.py
 NLP_Med/trained/fake_roberta-base_25ep/model.safetensors
+NLP_Med/Реализация_консоль/src/EDSClassifier.py
+NLP_Med/Реализация_консоль/src/label2id.json
+NLP_Med/Реализация_консоль/src/Main.py
+NLP_Med/Реализация_консоль/src/__pycache__/EDSClassifier.cpython-311.pyc
+NLP_Med/Реализация_консоль/src/fake_roberta-base_25ep/config.json
+NLP_Med/Реализация_консоль/src/fake_roberta-base_25ep/merges.txt
+NLP_Med/Реализация_консоль/src/fake_roberta-base_25ep/model.safetensors
+NLP_Med/Реализация_консоль/src/fake_roberta-base_25ep/special_tokens_map.json
+NLP_Med/Реализация_консоль/src/fake_roberta-base_25ep/tokenizer_config.json
+NLP_Med/Реализация_консоль/src/fake_roberta-base_25ep/vocab.json
+NLP_Med/trained/fake_t5-small_20ep/model.safetensors
+NLP_Med/trained/fake_t5-small_20ep/spiece.model
