@@ -931,6 +931,7 @@
   "clean_up_tokenization_spaces": true,
   "eos_token": "</s>",
   "extra_ids": 100,
+  "extra_special_tokens": {},
   "legacy": true,
   "model_max_length": 512,
   "pad_token": "<pad>",
