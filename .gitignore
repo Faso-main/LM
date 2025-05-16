@@ -144,3 +144,6 @@ NLP_Med/Реализация_консоль/src/fake_roberta-base_25ep/tokenizer
 NLP_Med/Реализация_консоль/src/fake_roberta-base_25ep/vocab.json
 NLP_Med/trained/fake_t5-small_20ep/model.safetensors
 NLP_Med/trained/fake_t5-small_20ep/spiece.model
+*.safetensors
+NLP_Med/src/new_electra.py
+RAG_LlamaIndex/test_RAG.py

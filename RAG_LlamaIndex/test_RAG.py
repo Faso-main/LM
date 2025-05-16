@@ -19,15 +19,15 @@ quantization_config = BitsAndBytesConfig(
 
 # 2. Инициализация модели с исправленными параметрами
 llm = HuggingFaceLLM(
-    model_name="mistralai/Mistral-7B-Instruct-v0.3",
+    model_name="mistralai/Mistral-7B-Instruct-v0.3", # нужно полегче 
     tokenizer_name="mistralai/Mistral-7B-Instruct-v0.3",
     device_map="auto",
     model_kwargs={
         "quantization_config": quantization_config,
-        "temperature": 0.3,
+        "temperature": 0.3, # что меняется
         "do_sample": True,  # Добавлено для работы с temperature
-        "max_length": 8196,
-        "torch_dtype": torch.float16
+        "max_length": 8196, # огромная длинна
+        "torch_dtype": torch.float16 # float8
     },
     generate_kwargs={
         "do_sample": True,
@@ -38,9 +38,10 @@ llm = HuggingFaceLLM(
 
 # 3. Загрузка эмбеддингов с обработкой ошибок
 try:
+    print(f'Развертка среды............')
     embed_model = HuggingFaceEmbedding(
         model_name="sentence-transformers/all-mpnet-base-v2",
-        device="cuda" if torch.cuda.is_available() else "cpu"
+        device="cuda" if torch.cuda.is_available() else "cpu" # вынеси это в конфигурацию
     )
 except Exception as e:
     print(f"Ошибка загрузки модели эмбеддингов: {str(e)}")
