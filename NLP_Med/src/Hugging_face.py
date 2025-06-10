@@ -1,5 +1,5 @@
 from huggingface_hub import HfApi, Repository, notebook_login # pip install huggingface_hub, ipywidgets
-
+# дополнительно нужно пройти авторизацию по ключу(>> huggingface-cli login), за ключом в личку
 
 # Добавьте эту функцию в ваш код
 def upload_to_huggingface(model_path, repo_name, results_path, img_path, lable_path):
