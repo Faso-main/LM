@@ -1,6 +1,13 @@
 from huggingface_hub import HfApi, Repository, notebook_login # pip install huggingface_hub, ipywidgets
 # дополнительно нужно пройти авторизацию по ключу(>> huggingface-cli login), за ключом в личку
 
+
+"""
+Добавить стороки ниже в ключевой if __name__ после main()
+HF_REPO_NAME = "faso312/test1"  # Прописал свое имя, свой аккаунт, возможно стоит сделать под это аккаунт команды
+upload_to_huggingface(SAVE_PATH, HF_REPO_NAME, RESULTS_PATH, IMG_PATH, LABLE_PATH)
+"""
+
 # Добавьте эту функцию в ваш код
 def upload_to_huggingface(model_path, repo_name, results_path, img_path, lable_path):
     # Аутентификация
