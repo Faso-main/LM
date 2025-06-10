@@ -11,7 +11,7 @@ import time
 import psutil
 
 # Конфигурация
-MODEL_NAME = 't5-small'  # Используем T5-small
+MODEL_NAME = 't5-small' 
 BATCH_SIZE = 8  
 MAX_LEN = 128
 EPOCHS = 20     

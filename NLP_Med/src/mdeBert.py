@@ -9,7 +9,7 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt  
 
 # Конфигурация
-MODEL_NAME = 'microsoft/mdeberta-v3-base'  # Используем mdeberta
+MODEL_NAME = 'microsoft/mdeberta-v3-base' 
 BATCH_SIZE = 8  
 MAX_LEN = 128
 EPOCHS = 150     

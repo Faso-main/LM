@@ -11,7 +11,7 @@ import time
 import psutil
 
 # Конфигурация
-MODEL_NAME = 'microsoft/mdeberta-v3-base'  # Используем mdeberta
+MODEL_NAME = 'microsoft/mdeberta-v3-base'  
 BATCH_SIZE = 8  
 MAX_LEN = 128
 EPOCHS = 5     

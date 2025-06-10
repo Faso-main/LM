@@ -1,5 +1,5 @@
 import pandas as pd
-import torch, json, os
+import torch, json, os, psutil, time
 import numpy as np
 from torch.utils.data import Dataset, DataLoader
 from transformers import ElectraTokenizer, ElectraForSequenceClassification, AdamW, get_linear_schedule_with_warmup
@@ -7,16 +7,16 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report, f1_score, recall_score
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-import time
-import psutil
 from sklearn.utils.class_weight import compute_class_weight
+from Hugging_face import upload_to_huggingface
+
 
 # Конфигурация (изменено на ELECTRA)
 MODEL_NAME = 'google/electra-base-discriminator'  # Или 'google/electra-small-discriminator' для меньшей модели
-BATCH_SIZE = 16
+BATCH_SIZE = 8
 MAX_LEN = 256
-EPOCHS = 20
-LEARNING_RATE = 3e-5
+EPOCHS = 5
+LEARNING_RATE = 1e-5
 WARMUP_STEPS = 100
 
 
@@ -109,6 +109,8 @@ class MedicalDataset(Dataset):
             'attention_mask': encoding['attention_mask'].flatten(),
             'labels': torch.tensor(label, dtype=torch.long)
         }
+
+
 
 # 3. Обучение с учетом весов классов
 def train_epoch(model, dataloader, optimizer, device, scheduler, class_weights=None):
@@ -297,3 +299,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+    HF_REPO_NAME = "faso312/test1"  # Прописал свое имя, свой аккаунт, возможно стоит сделать под это аккаунт команды
+    upload_to_huggingface(SAVE_PATH, HF_REPO_NAME, RESULTS_PATH, IMG_PATH, LABLE_PATH)
