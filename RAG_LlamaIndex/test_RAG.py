@@ -10,7 +10,6 @@ from transformers import BitsAndBytesConfig
 import torch
 import os
 
-# 1. Настройка квантования (заменяем устаревшие параметры)
 quantization_config = BitsAndBytesConfig(
     load_in_4bit=True,
     bnb_4bit_compute_dtype=torch.float16,
@@ -19,29 +18,21 @@ quantization_config = BitsAndBytesConfig(
 
 # 2. Инициализация модели с исправленными параметрами
 llm = HuggingFaceLLM(
-    model_name="mistralai/Mistral-7B-Instruct-v0.3", # нужно полегче 
-    tokenizer_name="mistralai/Mistral-7B-Instruct-v0.3",
-    device_map="auto",
-    model_kwargs={
-        "quantization_config": quantization_config,
-        "temperature": 0.3, # что меняется
-        "do_sample": True,  # Добавлено для работы с temperature
-        "max_length": 8196, # огромная длинна
-        "torch_dtype": torch.float16 # float8
-    },
-    generate_kwargs={
-        "do_sample": True,
-        "temperature": 0.3,
-        "top_p": 0.9
-    }
+    model_name="NousResearch/DeepHermes-3-Llama-3-8B-Preview",
+    tokenizer_name="NousResearch/DeepHermes-3-Llama-3-8B-Preview",
+    context_window=8192, #Лучше не уменьшать
+    max_new_tokens=2048, #Лучше не уменьшать
+    model_kwargs={"quantization_config": quantization_config},
+    generate_kwargs={"temperature": 0.6, #При temperature<0.4 выдаёт странные ответы. При 0.4-0.5 более-менее приличные ответы, но без подробностей. При >0.6 добавляет подробности, но при 0.9 начинает галлюцинировать
+                     }, 
+    device_map="cuda",
 )
 
 # 3. Загрузка эмбеддингов с обработкой ошибок
 try:
-    print(f'Развертка среды............')
     embed_model = HuggingFaceEmbedding(
         model_name="sentence-transformers/all-mpnet-base-v2",
-        device="cuda" if torch.cuda.is_available() else "cpu" # вынеси это в конфигурацию
+        device="cuda" if torch.cuda.is_available() else "cpu"
     )
 except Exception as e:
     print(f"Ошибка загрузки модели эмбеддингов: {str(e)}")
@@ -52,17 +43,17 @@ except Exception as e:
 
 # 4. Настройка чанкинга
 node_parser = SentenceSplitter(
-    chunk_size=512,
-    chunk_overlap=128,
-    include_metadata=True,
+    chunk_size=2048, #Размер 1 чанка
+    chunk_overlap=256, #На сколько 1 чанк заходит на другой
+    include_metadata=True, #Включение метаданных в чанк
     paragraph_separator="\n\n"
 )
 
 # 5. Загрузка документов
 documents = SimpleDirectoryReader(
-    input_dir=os.path.join(os.path.dirname(__file__), "data_GOST"),
+    input_dir=os.path.join(os.path.dirname(__file__), "data_GOST"), #Путь к папке
     filename_as_id=True,
-    required_exts=[".pdf"],
+    required_exts=[".pdf"], #Какие файлы будут браться
     file_metadata=lambda filename: {
         "source": os.path.basename(filename),
         "doc_type": "ГОСТ"
@@ -79,15 +70,17 @@ index = VectorStoreIndex.from_documents(
 # 7. Настройка пост-процессоров
 query_engine = index.as_query_engine(
     llm=llm,
-    response_mode="compact"
+    response_mode="compact", # Можно поставить "compact" - быстрый ответ с меньшими запросами к LLM, можно поставить "refine" - делает множество запросов для уточнения. Требует больше ВСЕГО
+    similarity_top_k=6 #Сколько чанков рассмотрит ИИ
 )
 
 # 8. Оптимизированный запрос
 query = (
-    "Отвечай строго на русском языке. Сформулируй полный перечень требований к техническому заданию. "
-    "Ответ должен быть структурированным, без повторений. "
-    "Используй только предоставленные документы. "
-    "Формат:\n1. Требование 1\n2. Требование 2\n..."
+    """Отвечай строго на русском языке. 
+    Сформулируй короткий перечень требований к оформлению технического задания. " 
+    Ответ должен быть структурированным, без повторений. 
+    Используй только предоставленные документы. 
+    Формат:\n1. Требование 1\n2. Требование 2\n..."""
 )
 
 # 9. Выполнение запроса с обработкой ошибок
