@@ -147,3 +147,5 @@ NLP_Med/trained/fake_t5-small_20ep/spiece.model
 *.safetensors
 NLP_Med/src/new_electra.py
 RAG_LlamaIndex/test_RAG.py
+NLP_Med/src/__pycache__/
+NLP_Med/src/hf/__pycache__/

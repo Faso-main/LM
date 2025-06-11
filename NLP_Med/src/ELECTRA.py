@@ -8,11 +8,11 @@ from sklearn.metrics import accuracy_score, classification_report, f1_score, rec
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 from sklearn.utils.class_weight import compute_class_weight
-from NLP_Med.src.HF_upload import upload_to_huggingface
+from hf.HF_upload import upload_to_huggingface
 
 
 # Конфигурация (изменено на ELECTRA)
-MODEL_NAME = 'google/electra-base-discriminator'  # Или 'google/electra-small-discriminator' для меньшей модели
+MODEL_NAME = 'google/electra-small-discriminator'  # Или 'google/electra-small-discriminator' для меньшей модели
 BATCH_SIZE = 8
 MAX_LEN = 256
 EPOCHS = 7
@@ -299,5 +299,5 @@ def main():
 
 if __name__ == '__main__':
     main()
-    HF_REPO_NAME = "faso312/test1"  # Прописал свое имя, свой аккаунт, возможно стоит сделать под это аккаунт команды
-    upload_to_huggingface(SAVE_PATH, HF_REPO_NAME, RESULTS_PATH, IMG_PATH, LABLE_PATH)
+    HF_REPO_NAME = "faso312/test2"  # Прописал свое имя, свой аккаунт, возможно стоит сделать под это аккаунт команды
+    upload_to_huggingface(SAVE_PATH, HF_REPO_NAME, RESULTS_PATH, IMG_PATH, LABLE_PATH, EPOCHS)
