@@ -8,14 +8,14 @@ from sklearn.metrics import accuracy_score, classification_report, f1_score, rec
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 from sklearn.utils.class_weight import compute_class_weight
-from Hugging_face import upload_to_huggingface
+from NLP_Med.src.HF_upload import upload_to_huggingface
 
 
 # Конфигурация (изменено на ELECTRA)
 MODEL_NAME = 'google/electra-base-discriminator'  # Или 'google/electra-small-discriminator' для меньшей модели
 BATCH_SIZE = 8
 MAX_LEN = 256
-EPOCHS = 5
+EPOCHS = 7
 LEARNING_RATE = 1e-5
 WARMUP_STEPS = 100
 
